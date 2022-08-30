@@ -196,3 +196,80 @@ New Alias:
 |--------------------|--------------------------|
 | `when().return()`  | `give().willreturn()`    |
 | `verify().method()` | then().should().method() |
+
+
+4. Strict Stubbing
+
+Whenever use the `MockitoExtension` introduced alongside Mockito annotations, it turns on the `strict stubbing` feature by default.
+
+
+```java
+when(paymentService.pay(any(), anyDouble())).thenReturn("1");
+
+    ...org.mockito.exceptions.misusing.UnnecessaryStubbingException: 
+    Unnecessary stubbings detected.
+    Clean & maintainable test code requires zero unnecessary code.
+
+// To allow the stubbing
+lenient().when(paymentService.pay(any(), anyDouble())).thenReturn("1");
+```
+
+5. Mock Static Method (experimental and turnoff by default)
+
+```java
+public class CurrencyConverter {
+
+	private static final double USD_TO_EUR_RATE = 0.85;
+	
+	public static double toEuro(double dollarAmount) {
+		return dollarAmount * USD_TO_EUR_RATE; 
+	}
+	
+}
+```
+
+Because the Converter is a static method, so our `BookingService` doesn't have a dependency to it directly, 
+how to mock that the method use `toEuro` return a specific value?
+
+```java
+    @Test
+    void should_Calculate_Correct_Price() {
+        try (MockedStatic<CurrencyConverter> mockedConverter = mockStatic(CurrencyConverter.class)) {
+            // Correct pay = 800
+            BookingRequest bookingRequest = new BookingRequest("2", LocalDate.of(2022, 1, 1),
+                    LocalDate.of(2022, 1, 9), 2, false);
+
+            double expected = 800.0;
+
+            mockedConverter.when(() -> CurrencyConverter.toEuro(anyDouble())).thenReturn(800.0);
+
+            double actual = bookingService.calculatePriceEuro(bookingRequest);
+
+            assertEquals(expected, actual);
+        }
+    }
+```
+
+Use try to make the `MockedStatic` a temp variable.
+
+6. Make static method mock better
+
+```java
+// Use `thenAnswer` when need dynamic values from runtime
+
+Mockito.when(mock.getName() ).thenReturn(“Mockito”)
+
+// return Data every time when run it
+Mockito.when (mock.getCurrentTime() ).thenAnswer(I -> new Date() );
+
+
+```
+
+https://stacktraceguru.com/unittest/thenreturn-vs-thenanswer
+
+When we should use thenReturn and when thenAnswer?
+
+The simplest answer is - if you need fixed return value on method call then we should use thenReturn(…)
+
+If you need to perform some operation or the value need to be computed at run time then we should use thenAnswer(…)
+
