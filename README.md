@@ -150,3 +150,49 @@ Test no Exception is thrown
 ```java
 doNothing()
 ```
+
+### Advanced Topics
+
+1. Argument Captors
+
+```java
+private ArgumentCaptor<Double> argumentCaptor;
+
+\\ use to capture arg passed in 
+\\ ^ is matcher type, so need to wrap other inputs to `eq()`
+
+        verify(paymentService, times(1)).pay(eq(bookingRequest), argumentCaptor.capture());
+        double capturedArg = argumentCaptor.getValue();
+
+        assertEquals(capturedArg, 800.0);
+```
+
+
+2. Annotations
+
+```java
+@Mock
+
+@InjectMocks
+
+@Spy
+
+@Captor
+
+@ExtendWith(MockitoExtension.class)
+
+// In Junit4, replace above with @RunWith
+```
+
+3. Mockito BDD
+
+Behaviour-Driven-Development
+
+`import org.mockito.BDDMockito.*;`
+
+New Alias:
+
+| Old Name           | New Name                 |
+|--------------------|--------------------------|
+| `when().return()`  | `give().willreturn()`    |
+| `verify().method()` | then().should().method() |
