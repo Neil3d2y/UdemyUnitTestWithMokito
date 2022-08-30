@@ -273,3 +273,8 @@ The simplest answer is - if you need fixed return value on method call then we s
 
 If you need to perform some operation or the value need to be computed at run time then we should use thenAnswer(…)
 
+7. Mocking `Final` and `Private` methods
+
+Private: *Cannot*
+
+Final: Use `Mockito-Inline` (as it's experimental)
